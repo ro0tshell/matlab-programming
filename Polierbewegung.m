@@ -2,16 +2,16 @@ close all;
 clear all;
 clc;
 
-l=1800;     % Optikl‰nge
+l=1800;     % Optikl√§nge
 b=140;      % Optikbreite
-wl=1400;    % Werkzeugl‰nge
+wl=1400;    % Werkzeugl√§nge
 wb=100;     % Werkzeugbreite
 
 x=0;        % Weg x
 y=0;        % Weg y
 Ax=500;     % Achsenbewegung synchron
 Ay=25;      % Achsenbewegung synchron
-tolx=100;   % Toleranz x-Bewegung
+tolx=50;   % Toleranz x-Bewegung
 toly=7;     % Toleranz y-Bewegung
 Vx=400;     % Geschwindigkeit x-Achse mm/s
 Vy=20;      % Geschwindigkeit y-Achse mm/s
@@ -19,29 +19,46 @@ gx=1000;    % Beschleunigung x-Achse mm/s^2
 gy=500;     % Beschleunigung y-Achse mm/s^2
 tende=120;    % Bearbeitungszeit in s
 
-auf=1;      % Aufl‰ˆsung
-ZS  = 0.01; % Zeitauflˆsung
+auf=1;      % Aufl√§√∂sung
+ZS  = 0.01; % Zeitaufl√∂sung
 
 atx = Vx/gx;
 aty = Vy/gy;
 
 % Programmvariablen %
 
-loop=1;     % boolean
+loop=0;     % boolean
 i=0;        % Iteration
-mx=0;       % Grˆﬂe Matrix x
-my=0;       % Grˆﬂe Matrix y
+mx=0;       % Gr√∂√üe Matrix x
+my=0;       % Gr√∂√üe Matrix y
 
 %Bewegung in x
 
 for t=0:ZS:tende
  i=i+1;
- x=Ax*sind((1/2)*Vx*t);
- x = Ax*asin(sin((2*pi/(2*(l/Vx)))*t))/(pi/2);
+ restx(i) = rem(t, l/Vx);
+ if  restx(i) == 0
+     Arx = Ax - randi(tolx, 1);
+ end
+ x = Arx*asin(sin((2*pi/(2*(l/Vx)))*t))/(pi/2);
  Xb(i,1)=i;
  Xb(i,2)=x;
  
- y = Ay*asin(sin((2*pi/(2*(b/Vy)))*t))/(pi/2);
+ resty(i) = rem(t, b/Vy);
+ if resty(i) == 0
+     Ary = Ay - randi(toly, 1);
+ end
+%  if b/Vy*(loop+1)<t<b/Vy*(loop+1)+aty
+%      y = Ary*asin(sin((pi*Vy/b)*t))/(pi/2);
+%      if t == Vy*(loop+1)+aty
+%          loop = loop+1;
+%      end
+%  else
+%      y = Ary*asin(sin((2*pi/(2*(b/Vy)))*t))/(pi/2);
+%  end
+ 
+ y = Ary*asin(sin((pi*Vy/b)*t))/(pi/2);
+ 
  Yb(i,1)=i;
  Yb(i,2)=y;
 end
